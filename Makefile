@@ -23,6 +23,45 @@ run: $(OUTFILE) rerun score
 score:
 	@echo "Check run1.log and run2.log for results."
 	@echo "See README.md for run and reporting rules." 
+
+COREMARK_PORT_DIR ?= riscv-core
+COREMARK_BUILD_DIR ?= build
+COREMARK_ITERATIONS ?= $(ITERATIONS)
+COREMARK_CC ?= riscv64-unknown-elf-gcc
+COREMARK_OBJCOPY ?= riscv64-unknown-elf-objcopy
+COREMARK_OBJDUMP ?= riscv64-unknown-elf-objdump
+COREMARK_CFLAGS ?= -O2 -march=rv64im_zicsr -mabi=lp64 -mcmodel=medany -mno-relax -ffreestanding -fno-builtin -nostdlib -nostartfiles
+COREMARK_ELF := $(COREMARK_BUILD_DIR)/coremark.riscv
+COREMARK_BIN := $(COREMARK_ELF).bin
+COREMARK_HEX := $(COREMARK_BIN).hex
+COREMARK_DUMP := $(COREMARK_ELF).dump
+COREMARK_SRCS := \
+	core_main.c \
+	core_list_join.c \
+	core_matrix.c \
+	core_state.c \
+	core_util.c \
+	$(COREMARK_PORT_DIR)/core_portme.c \
+	$(COREMARK_PORT_DIR)/crt0.S
+
+.PHONY: coremark riscv_core_force
+coremark: $(COREMARK_HEX)
+
+$(COREMARK_ELF): riscv_core_force $(COREMARK_SRCS) $(COREMARK_PORT_DIR)/core_portme.h $(COREMARK_PORT_DIR)/link.ld Makefile
+	mkdir -p $(COREMARK_BUILD_DIR)
+	$(COREMARK_CC) $(COREMARK_CFLAGS) \
+		-DPERFORMANCE_RUN=1 -DITERATIONS=$(COREMARK_ITERATIONS) -DFLAGS_STR=\"coremark-rv64im\" \
+		-I$(COREMARK_PORT_DIR) -I. \
+		-T $(COREMARK_PORT_DIR)/link.ld \
+		-Wl,--no-relax \
+		-o $@ $(COREMARK_SRCS) -lgcc
+
+$(COREMARK_HEX): $(COREMARK_ELF)
+	$(COREMARK_OBJCOPY) -O binary $< $(COREMARK_BIN)
+	python3 $(COREMARK_PORT_DIR)/bin2hex.py 8 $(COREMARK_BIN) > $@
+	$(COREMARK_OBJDUMP) -D $< > $(COREMARK_DUMP)
+
+riscv_core_force:
 	
 ifndef PORT_DIR
 # Ports for a couple of common self hosted platforms
