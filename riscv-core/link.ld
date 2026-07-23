@@ -3,18 +3,18 @@ ENTRY(_start)
 
 SECTIONS
 {
-    . = 0;
+    . = 0x80000000;
 
     .text.init : {
         KEEP(*(.text.init))
     }
 
-    . = 0x1000;
+    . = 0x80001000;
     .tohost : {
         KEEP(*(.tohost))
     }
 
-    . = 0x2000;
+    . = 0x80002000;
     .text : {
         *(.text .text.*)
     }
@@ -39,6 +39,6 @@ SECTIONS
 
     . = ALIGN(16);
     __global_pointer$ = MIN(__bss_start + 0x800, MAX(__bss_start, __bss_end - 0x800));
-    __stack_top = 0x100000;
+    __stack_top = 0x80100000;
     _end = .;
 }
