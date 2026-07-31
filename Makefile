@@ -13,6 +13,7 @@
 # limitations under the License.
 # 
 # Original Author: Shay Gal-on
+# Modified by Latte72R in 2026 to add a freestanding RV64 build target.
 
 # Make sure the default target is to simply build and run the benchmark.
 RSTAMP = v1.0

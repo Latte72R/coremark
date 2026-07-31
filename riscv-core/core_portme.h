@@ -1,3 +1,15 @@
+/*
+Copyright 2018 Embedded Microprocessor Benchmark Consortium (EEMBC)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Modified by Latte72R in 2026 for a freestanding RV64 target.
+*/
+
 #ifndef CORE_PORTME_H
 #define CORE_PORTME_H
 
